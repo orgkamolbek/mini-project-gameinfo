@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Info</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+        }
+        .container {
+            background-color: #16213e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        input {
+            width: 80%;
+            padding: 12px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 25px;
+            background-color: #e94560;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #0f3460;
+        }
+        #result {
+            margin-top: 30px;
+            text-align: left;
+            line-height: 1.6;
+        }
+        .game-card {
+            border-top: 1px solid #444;
+            padding-top: 20px;
+        }
+        img {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>O'yin qidiruvchi</h1>
+        <input type="text" id="gameInput" placeholder="O'yin nomini yozing...">
+        <br>
+        <button onclick="searchGame()">QIDIRISH</button>
+
+        <div id="result">
+            </div>
+    </div>
+
+    <script>
+        async function searchGame() {
+            const gameName = document.getElementById('gameInput').value;
+            const resultDiv = document.getElementById('result');
+            const apiKey = 'bcd02ef4f3e44711a7a2d25dc586266a'; // Sizning kalitingiz
+
+            if (!gameName) {
+                alert("Iltimos, nom kiriting!");
+                return;
+            }
+
+            resultDiv.innerHTML = "Qidirilmoqda...";
+
+            try {
+                const response = await fetch(`https://api.rawg.io/api/games?key=${apiKey}&search=${gameName}`);
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    const game = data.results[0];
+                    
+                    resultDiv.innerHTML = `
+                        <div class="game-card">
+                            <h2>🎮 ${game.name}</h2>
+                            <p>📅 <b>Chiqarilgan:</b> ${game.released || 'Noma\'lum'}</p>
+                            <p>⭐ <b>Reyting:</b> ${game.rating} / 5</p>
+                            <p>📂 <b>Janr:</b> ${game.genres.map(g => g.name).join(', ')}</p>
+                            <img src="${game.background_image}" alt="Game image">
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = "❌ O'yin topilmadi.";
+                }
+            } catch (error) {
+                resultDiv.innerHTML = "⚠️ Xatolik yuz berdi.";
+            }
+        }
+    </script>
+</body>
+</html>
